@@ -207,7 +207,7 @@ async def offer(request, diffuser_handle):
 
         log_info("Connection state is %s", pc.connectionState)
 
-        # If the state is "connecting," start a 10-second timeout
+        # If the state is "connecting," start a 1 minute timeout, because this thing gets tunneled and tunelling is slow asf.. (cloudflare pls make better tunneling)
         if pc.connectionState == "connecting":
             if timeout_task is None:
                 timeout_task = asyncio.create_task(connection_timeout(pc))
@@ -225,9 +225,9 @@ async def offer(request, diffuser_handle):
             pcs.discard(pc)
 
     async def connection_timeout(pc):
-        await asyncio.sleep(10)
+        await asyncio.sleep(60)
         if pc.connectionState == "connecting":
-            log_info("Connection stuck in 'connecting' for over 10 seconds. Closing.")
+            log_info("Connection stuck in 'connecting' for over 1 minute. Closing.")
             end_stream()
             await pc.close()
             pcs.discard(pc)
